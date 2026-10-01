@@ -12,19 +12,19 @@ public class Event {
 
     public static Event create(String name, ZonedDateTime start, int capacity, Clock clock) {
 
-        if (capacity < 1 || capacity > 100_000){
-            throw new IllegalArgumentException("The capacity must be between 1 and 100,000");
-        }
-
-        if (!start.isAfter( ZonedDateTime.now(clock) ) ){
+        if (!start.isAfter(ZonedDateTime.now(clock))) {
             throw new IllegalArgumentException("The start date must be in the future");
         }
-
 
         return new Event(name, start, capacity, EventStatus.DRAFT);
     }
 
     private Event(String name, ZonedDateTime start, int capacity, EventStatus status) {
+
+        if (capacity < 1 || capacity > 100_000) {
+            throw new IllegalArgumentException("The capacity must be between 1 and 100,000, but was " + capacity);
+        }
+
         this.name = name;
         this.start = start;
         this.capacity = capacity;
