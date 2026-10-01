@@ -11,6 +11,12 @@ public class Event {
     private EventStatus status;
 
     public static Event create(String name, ZonedDateTime start, int capacity, Clock clock) {
+
+        if (capacity < 1 || capacity > 100_000){
+            throw new IllegalArgumentException("The capacity must be between 1 and 100,000");
+        }
+
+
         return new Event(name, start, capacity, EventStatus.DRAFT);
     }
 
