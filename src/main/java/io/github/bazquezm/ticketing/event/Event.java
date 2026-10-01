@@ -5,6 +5,8 @@ import java.time.ZonedDateTime;
 
 public class Event {
 
+    public static int VALID_EVENT_NAME_LENGTH = 100;
+
     private final String name;
     private final ZonedDateTime start;
     private final int capacity;
@@ -27,6 +29,10 @@ public class Event {
 
         if (name.isBlank()){
             throw new IllegalArgumentException("The event name is required");
+        }
+
+        if (name.length() > VALID_EVENT_NAME_LENGTH){
+            throw new IllegalArgumentException("The maximum event name maxlength is: " + VALID_EVENT_NAME_LENGTH);
         }
 
 
