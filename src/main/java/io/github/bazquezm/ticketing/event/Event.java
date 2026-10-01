@@ -14,6 +14,10 @@ public class Event {
 
     public static Event create(String name, ZonedDateTime start, int capacity, Clock clock) {
 
+        if (start == null ){
+            throw new IllegalArgumentException("start date is required");
+        }
+
         if (!start.isAfter(ZonedDateTime.now(clock))) {
             throw new IllegalArgumentException("The start date must be in the future");
         }
@@ -27,7 +31,7 @@ public class Event {
             throw new IllegalArgumentException("The capacity must be between 1 and 100,000, but was " + capacity);
         }
 
-        if (name.isBlank()){
+        if (name== null || name.isBlank() ){
             throw new IllegalArgumentException("The event name is required");
         }
 

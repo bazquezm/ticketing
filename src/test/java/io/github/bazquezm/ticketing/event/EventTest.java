@@ -101,4 +101,18 @@ public class EventTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("maximum event name");
     }
+
+    @Test
+    void rejectNullEventNameReceived() {
+        assertThatThrownBy(() -> Event.create(null , FUTURE_START, 500, FIXED_CLOCK))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("name");
+    }
+
+    @Test
+    void rejectNullStartReceived() {
+        assertThatThrownBy(() -> Event.create("Rock Night" , null, 500, FIXED_CLOCK))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("start");
+    }
 }
