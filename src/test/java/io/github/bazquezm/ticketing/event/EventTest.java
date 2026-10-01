@@ -87,4 +87,18 @@ public class EventTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("name");
     }
+
+    @Test
+    void eventWithEventNameValidLengthIsAccepted() {
+        Event event = Event.create("a".repeat(Event.VALID_EVENT_NAME_LENGTH), FUTURE_START, 500, FIXED_CLOCK);
+        assertThat(event.name().length()).isEqualTo(Event.VALID_EVENT_NAME_LENGTH);
+
+    }
+
+    @Test
+    void rejectMaximumEventNameLength() {
+        assertThatThrownBy(() -> Event.create("a".repeat(Event.VALID_EVENT_NAME_LENGTH + 1) , FUTURE_START, 500, FIXED_CLOCK))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("maximum event name");
+    }
 }
