@@ -81,7 +81,7 @@ public class EventTest {
     }
 
     @Test
-    void eventBlankNameIsRejected() {
+    void rejectsBlankName() {
 
         assertThatThrownBy(() -> Event.create("", FUTURE_START, 500, FIXED_CLOCK))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -89,30 +89,37 @@ public class EventTest {
     }
 
     @Test
-    void eventWithEventNameValidLengthIsAccepted() {
-        Event event = Event.create("a".repeat(Event.VALID_EVENT_NAME_LENGTH), FUTURE_START, 500, FIXED_CLOCK);
-        assertThat(event.name().length()).isEqualTo(Event.VALID_EVENT_NAME_LENGTH);
+    void acceptsNameOf100Characters() {
+        Event event = Event.create("a".repeat(100), FUTURE_START, 500, FIXED_CLOCK);
+        assertThat(event.name().length()).isEqualTo(100);
 
     }
 
     @Test
-    void rejectMaximumEventNameLength() {
-        assertThatThrownBy(() -> Event.create("a".repeat(Event.VALID_EVENT_NAME_LENGTH + 1) , FUTURE_START, 500, FIXED_CLOCK))
+    void rejectsNameOf101Characters() {
+        assertThatThrownBy(() -> Event.create("a".repeat(101) , FUTURE_START, 500, FIXED_CLOCK))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("maximum event name");
+                .hasMessageContaining("name must be at most 100");
     }
 
     @Test
-    void rejectNullEventNameReceived() {
+    void rejectsNullName() {
         assertThatThrownBy(() -> Event.create(null , FUTURE_START, 500, FIXED_CLOCK))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(NullPointerException.class)
                 .hasMessageContaining("name");
     }
 
     @Test
-    void rejectNullStartReceived() {
+    void rejectsNullStart() {
         assertThatThrownBy(() -> Event.create("Rock Night" , null, 500, FIXED_CLOCK))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(NullPointerException.class)
                 .hasMessageContaining("start");
+    }
+
+    @Test
+    void rejectsEmptyName() {
+        assertThatThrownBy(() -> Event.create("  " , FUTURE_START, 500, FIXED_CLOCK))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("name");
     }
 }
