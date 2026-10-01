@@ -16,6 +16,10 @@ public class Event {
             throw new IllegalArgumentException("The capacity must be between 1 and 100,000");
         }
 
+        if (!start.isAfter( ZonedDateTime.now(clock) ) ){
+            throw new IllegalArgumentException("The start date must be in the future");
+        }
+
 
         return new Event(name, start, capacity, EventStatus.DRAFT);
     }
