@@ -72,4 +72,20 @@ public class EventTest {
 
     }
 
+    @Test
+    void rejectsStartEqualToNow() {
+        ZonedDateTime now = ZonedDateTime.now(FIXED_CLOCK);
+
+        assertThatThrownBy(() -> Event.create("Rock Night", now, 500, FIXED_CLOCK))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("start");
+    }
+
+    @Test
+    void acceptsStartOneSecondAfterNow() {
+        ZonedDateTime start = ZonedDateTime.now(FIXED_CLOCK).plusSeconds(1);
+
+        Event event = Event.create("Rock Night", start, 100_000, FIXED_CLOCK);
+        assertThat(event.capacity()).isEqualTo(100_000);
+    }
 }
