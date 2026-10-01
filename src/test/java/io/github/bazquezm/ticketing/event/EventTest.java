@@ -79,4 +79,47 @@ public class EventTest {
         Event event = Event.create("Rock Night", start, 500, FIXED_CLOCK);
         assertThat(event.start()).isEqualTo(start);
     }
+
+    @Test
+    void rejectsBlankName() {
+
+        assertThatThrownBy(() -> Event.create("", FUTURE_START, 500, FIXED_CLOCK))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("name");
+    }
+
+    @Test
+    void acceptsNameOf100Characters() {
+        Event event = Event.create("a".repeat(100), FUTURE_START, 500, FIXED_CLOCK);
+        assertThat(event.name().length()).isEqualTo(100);
+
+    }
+
+    @Test
+    void rejectsNameOf101Characters() {
+        assertThatThrownBy(() -> Event.create("a".repeat(101) , FUTURE_START, 500, FIXED_CLOCK))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("name must be at most 100");
+    }
+
+    @Test
+    void rejectsNullName() {
+        assertThatThrownBy(() -> Event.create(null , FUTURE_START, 500, FIXED_CLOCK))
+                .isInstanceOf(NullPointerException.class)
+                .hasMessageContaining("name");
+    }
+
+    @Test
+    void rejectsNullStart() {
+        assertThatThrownBy(() -> Event.create("Rock Night" , null, 500, FIXED_CLOCK))
+                .isInstanceOf(NullPointerException.class)
+                .hasMessageContaining("start");
+    }
+
+    @Test
+    void rejectsEmptyName() {
+        assertThatThrownBy(() -> Event.create("  " , FUTURE_START, 500, FIXED_CLOCK))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("name");
+    }
 }
