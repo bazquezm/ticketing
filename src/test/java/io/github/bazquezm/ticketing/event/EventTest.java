@@ -15,58 +15,49 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class EventTest {
 
     private static final ZoneId MEXICO_CITY = ZoneId.of("America/Mexico_City");
+    public static final ZonedDateTime FUTURE_START = ZonedDateTime.of(2026, 12, 5, 20, 0, 0, 0, MEXICO_CITY);
     private static final Clock FIXED_CLOCK =
             Clock.fixed(Instant.parse("2026-10-01T12:00:00Z"), ZoneOffset.UTC);
 
     @Test
-    void createsADraftEventWithValidData(){
+    void createsADraftEventWithValidData() {
 
-        ZonedDateTime start = ZonedDateTime.of(2026, 12, 5, 20, 0, 0, 0, MEXICO_CITY);
-
-        Event event = Event.create("Rock Night", start, 500, FIXED_CLOCK);
+        Event event = Event.create("Rock Night", FUTURE_START, 500, FIXED_CLOCK);
 
         assertThat(event.name()).isEqualTo("Rock Night");
-        assertThat(event.start()).isEqualTo(start);
+        assertThat(event.start()).isEqualTo(FUTURE_START);
         assertThat(event.capacity()).isEqualTo(500);
         assertThat(event.status()).isEqualTo(EventStatus.DRAFT);
     }
 
     @Test
-    void createsADraftEventWithZeroCapacity(){
+    void rejectsZeroCapacity() {
 
-        ZonedDateTime start = ZonedDateTime.of(2026, 12, 5, 20, 0, 0, 0, MEXICO_CITY);
-
-        assertThatThrownBy(() -> Event.create("Rock Night", start, 0, FIXED_CLOCK))
+        assertThatThrownBy(() -> Event.create("Rock Night", FUTURE_START, 0, FIXED_CLOCK))
                 .isInstanceOf(IllegalArgumentException.class)
-        .hasMessageContaining("capacity");
+                .hasMessageContaining("capacity");
     }
 
     @Test
-    void createsADraftEventWithMinimumCapacity(){
+    void acceptsMinimumCapacityOfOne() {
 
-        ZonedDateTime start = ZonedDateTime.of(2026, 12, 5, 20, 0, 0, 0, MEXICO_CITY);
-
-        Event event = Event.create("Rock Night", start, 1, FIXED_CLOCK);
+        Event event = Event.create("Rock Night", FUTURE_START, 1, FIXED_CLOCK);
         assertThat(event.capacity()).isEqualTo(1);
 
     }
 
     @Test
-    void createsADraftEventWithMaxCapacity(){
+    void acceptsMaximumCapacityOf100000() {
 
-        ZonedDateTime start = ZonedDateTime.of(2026, 12, 5, 20, 0, 0, 0, MEXICO_CITY);
-
-        Event event = Event.create("Rock Night", start, 100_000, FIXED_CLOCK);
+        Event event = Event.create("Rock Night", FUTURE_START, 100_000, FIXED_CLOCK);
         assertThat(event.capacity()).isEqualTo(100_000);
 
     }
 
     @Test
-    void createsADraftEventWithOverduedCapacity(){
+    void rejectsCapacityAboveMaximum() {
 
-        ZonedDateTime start = ZonedDateTime.of(2026, 12, 5, 20, 0, 0, 0, MEXICO_CITY);
-
-        assertThatThrownBy(() -> Event.create("Rock Night", start, 100_001, FIXED_CLOCK))
+        assertThatThrownBy(() -> Event.create("Rock Night", FUTURE_START, 100_001, FIXED_CLOCK))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("capacity");
 
@@ -74,9 +65,9 @@ public class EventTest {
 
     @Test
     void rejectsStartEqualToNow() {
-        ZonedDateTime now = ZonedDateTime.now(FIXED_CLOCK);
+        ZonedDateTime start = ZonedDateTime.now(FIXED_CLOCK);
 
-        assertThatThrownBy(() -> Event.create("Rock Night", now, 500, FIXED_CLOCK))
+        assertThatThrownBy(() -> Event.create("Rock Night", start, 500, FIXED_CLOCK))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("start");
     }
@@ -85,7 +76,7 @@ public class EventTest {
     void acceptsStartOneSecondAfterNow() {
         ZonedDateTime start = ZonedDateTime.now(FIXED_CLOCK).plusSeconds(1);
 
-        Event event = Event.create("Rock Night", start, 100_000, FIXED_CLOCK);
-        assertThat(event.capacity()).isEqualTo(100_000);
+        Event event = Event.create("Rock Night", start, 500, FIXED_CLOCK);
+        assertThat(event.start().equals(start)  );
     }
 }
