@@ -77,6 +77,6 @@ public class EventTest {
         ZonedDateTime start = ZonedDateTime.now(FIXED_CLOCK).plusSeconds(1);
 
         Event event = Event.create("Rock Night", start, 500, FIXED_CLOCK);
-        assertThat(event.start().equals(start)  );
+        assertThat(event.start()).isEqualTo(start);
     }
 }
