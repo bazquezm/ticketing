@@ -25,6 +25,11 @@ public class Event {
             throw new IllegalArgumentException("The capacity must be between 1 and 100,000, but was " + capacity);
         }
 
+        if (name.isBlank()){
+            throw new IllegalArgumentException("The event name is required");
+        }
+
+
         this.name = name;
         this.start = start;
         this.capacity = capacity;

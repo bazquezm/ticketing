@@ -79,4 +79,12 @@ public class EventTest {
         Event event = Event.create("Rock Night", start, 500, FIXED_CLOCK);
         assertThat(event.start()).isEqualTo(start);
     }
+
+    @Test
+    void eventBlankNameIsRejected() {
+
+        assertThatThrownBy(() -> Event.create("", FUTURE_START, 500, FIXED_CLOCK))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("name");
+    }
 }
