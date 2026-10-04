@@ -38,7 +38,7 @@ public class Event {
         }
 
         if (name.length() > MAX_NAME_LENGTH){
-            throw new IllegalArgumentException("name must be at most 100 characters, but was: " + name.length());
+            throw new IllegalArgumentException("name must be at most "+ MAX_NAME_LENGTH + " characters, but was: " + name.length());
         }
 
 
