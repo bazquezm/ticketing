@@ -122,4 +122,52 @@ public class EventTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("name");
     }
+
+    @Test
+    void createsEventWithAnId(){
+
+        Event event = Event.create("Rock Night", FUTURE_START, 500, FIXED_CLOCK);
+        assertThat(event.id()).isNotNull();
+
+    }
+
+    @Test
+    void restoresAnEventWhoseStartIsInThePast(){
+        ZonedDateTime PAST_START = ZonedDateTime.of(2025, 12, 5, 20, 0, 0, 0, MEXICO_CITY);
+        EventId id = EventId.newId();
+        Event event = Event.restore(id, "Rock Night", EventStatus.DRAFT, PAST_START, 500);
+        assertThat(event.id()).isNotNull();
+
+    }
+
+    @Test
+    void eventsWithTheSameIdAreEqual(){
+
+        EventId id = EventId.newId();
+        Event event = Event.restore(id,"Rock Night",EventStatus.DRAFT, FUTURE_START, 500);
+        Event event2 = Event.restore(id,"Jazz Night",EventStatus.DRAFT, FUTURE_START, 500);
+
+        assertThat(event).isEqualTo(event2).hasSameHashCodeAs(event2);
+
+    }
+
+    @Test
+    void eventsWithTheSameDataButDifferentIdsAreNotEqual(){
+
+        Event event = Event.restore(EventId.newId(),"Rock Night",EventStatus.DRAFT, FUTURE_START, 500);
+        Event event2 = Event.restore(EventId.newId(),"Jazz Night",EventStatus.DRAFT, FUTURE_START, 500);
+
+
+        assertThat(event).isNotEqualTo(event2);
+
+    }
+
+    @Test
+    void rejectsNullId(){
+
+        assertThatThrownBy(() -> Event.restore(null,"a".repeat(101) , EventStatus.DRAFT, FUTURE_START, 500))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("id is required");
+    }
+
 }
