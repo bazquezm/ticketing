@@ -4,10 +4,11 @@ import java.time.Clock;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 
-public class Event {
+public final class Event {
 
     private static final int MAX_NAME_LENGTH = 100;
 
+    private final EventId id;
     private final String name;
     private final ZonedDateTime start;
     private final int capacity;
@@ -15,7 +16,7 @@ public class Event {
 
     public static Event create(String name, ZonedDateTime start, int capacity, Clock clock) {
 
-        Event event = new Event(name, start, capacity, EventStatus.DRAFT);
+        Event event = new Event(name, start, capacity, EventStatus.DRAFT, EventId.newId());
 
         if (!event.start().isAfter(ZonedDateTime.now(clock))) {
             throw new IllegalArgumentException("The start date must be in the future");
@@ -24,7 +25,15 @@ public class Event {
         return event;
     }
 
-    private Event(String name, ZonedDateTime start, int capacity, EventStatus status) {
+    public static Event restore(EventId id, String name, EventStatus status, ZonedDateTime start, int capacity) {
+
+        Objects.requireNonNull(id, "id is required");
+        Objects.requireNonNull(status, "status is required");
+
+        return new Event(name, start, capacity, status , id);
+    }
+
+    private Event(String name, ZonedDateTime start, int capacity, EventStatus status, EventId id) {
 
         Objects.requireNonNull(start, "start date is required");
         Objects.requireNonNull(name, "The event name is required");
@@ -46,6 +55,7 @@ public class Event {
         this.start = start;
         this.capacity = capacity;
         this.status = status;
+        this.id = id;
     }
 
     public String name() {
@@ -62,5 +72,19 @@ public class Event {
 
     public EventStatus status() {
         return this.status;
+    }
+
+    public EventId id() {
+        return id;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof Event other && id.equals(other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 }
