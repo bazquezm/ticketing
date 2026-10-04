@@ -99,7 +99,7 @@ public class EventTest {
     void rejectsNameOf101Characters() {
         assertThatThrownBy(() -> Event.create("a".repeat(101) , FUTURE_START, 500, FIXED_CLOCK))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("name must be at most 100");
+                .hasMessageContaining("name must be at most 100 characters, but was: 101");
     }
 
     @Test
