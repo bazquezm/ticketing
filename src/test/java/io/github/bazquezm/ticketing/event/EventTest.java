@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class EventTest {
 
     private static final ZoneId MEXICO_CITY = ZoneId.of("America/Mexico_City");
-    public static final ZonedDateTime FUTURE_START = ZonedDateTime.of(2026, 12, 5, 20, 0, 0, 0, MEXICO_CITY);
+    private static final ZonedDateTime FUTURE_START = ZonedDateTime.of(2026, 12, 5, 20, 0, 0, 0, MEXICO_CITY);
     private static final Clock FIXED_CLOCK =
             Clock.fixed(Instant.parse("2026-10-01T12:00:00Z"), ZoneOffset.UTC);
 
@@ -83,7 +83,7 @@ public class EventTest {
     @Test
     void rejectsBlankName() {
 
-        assertThatThrownBy(() -> Event.create("", FUTURE_START, 500, FIXED_CLOCK))
+        assertThatThrownBy(() -> Event.create("       ", FUTURE_START, 500, FIXED_CLOCK))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("name");
     }
@@ -118,7 +118,7 @@ public class EventTest {
 
     @Test
     void rejectsEmptyName() {
-        assertThatThrownBy(() -> Event.create("  " , FUTURE_START, 500, FIXED_CLOCK))
+        assertThatThrownBy(() -> Event.create("" , FUTURE_START, 500, FIXED_CLOCK))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("name");
     }
