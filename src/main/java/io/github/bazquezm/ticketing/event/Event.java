@@ -4,7 +4,7 @@ import java.time.Clock;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 
-public class Event {
+public final class Event {
 
     private static final int MAX_NAME_LENGTH = 100;
 
@@ -26,6 +26,10 @@ public class Event {
     }
 
     public static Event restore(EventId id, String name, EventStatus status, ZonedDateTime start, int capacity) {
+
+        Objects.requireNonNull(id, "id is required");
+        Objects.requireNonNull(status, "status is required");
+
         return new Event(name, start, capacity, status , id);
     }
 
@@ -76,11 +80,11 @@ public class Event {
 
     @Override
     public boolean equals(Object obj) {
-        return ( obj instanceof Event ) && (this).id.equals(((Event) obj).id);
+        return obj instanceof Event other && id.equals(other.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id);
+        return id.hashCode();
     }
 }
