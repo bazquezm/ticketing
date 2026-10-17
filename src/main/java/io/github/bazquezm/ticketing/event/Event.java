@@ -4,7 +4,7 @@ import java.time.Clock;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 
-public class Event {
+public final class Event {
 
     private static final int MAX_NAME_LENGTH = 100;
 
@@ -33,6 +33,8 @@ public class Event {
 
         Objects.requireNonNull(start, "start date is required");
         Objects.requireNonNull(name, "The event name is required");
+        Objects.requireNonNull(id, "id is required");
+        Objects.requireNonNull(status, "status is required");
 
         if (capacity < 1 || capacity > 100_000) {
             throw new IllegalArgumentException("The capacity must be between 1 and 100,000, but was " + capacity);
@@ -76,11 +78,11 @@ public class Event {
 
     @Override
     public boolean equals(Object obj) {
-        return ( obj instanceof Event ) && (this).id.equals(((Event) obj).id);
+        return obj instanceof Event other && id.equals(other.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id);
+        return id.hashCode();
     }
 }
