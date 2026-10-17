@@ -7,7 +7,6 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.HashSet;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -188,9 +187,10 @@ public class EventTest {
         Event event = Event.create("Rock Night", FUTURE_START, 500, FIXED_CLOCK);
         Seat seat = new Seat("A", 1 );
 
-        boolean reservedSeat = event.reserveFreeSeat(seat);
+        event.reserve(seat);
 
-        assertThat(reservedSeat).isEqualTo(true);
+        assertThat(event.reservedSeats()).containsExactly(seat);
+        assertThat(event.reservedSeats().size()).isEqualTo(1);
     }
 
     @Test
@@ -198,11 +198,12 @@ public class EventTest {
 
         Event event = Event.create("Rock Night", FUTURE_START, 500, FIXED_CLOCK);
         Seat seat1 = new Seat("A", 1 );
-        event.reserveFreeSeat(seat1);
+        event.reserve(seat1);
 
-        assertThatThrownBy(() -> event.reserveFreeSeat(seat1))
+        assertThatThrownBy(() -> event.reserve(seat1))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("Seat is already reserved");
+        assertThat(event.reservedSeats()).containsExactly(seat1);
 
     }
 
@@ -213,9 +214,9 @@ public class EventTest {
         Seat seat1 = new Seat("A", 1 );
         Seat seat2 = new Seat("A", 2 );
 
-        event.reserveFreeSeat(seat1);
+        event.reserve(seat1);
 
-        assertThatThrownBy(() -> event.reserveFreeSeat(seat2))
+        assertThatThrownBy(() -> event.reserve(seat2))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("event is full");
     }
@@ -225,7 +226,7 @@ public class EventTest {
 
         Event event = Event.create("Rock Night", FUTURE_START, 1, FIXED_CLOCK);
 
-        assertThatThrownBy(() -> event.reserveFreeSeat(null))
+        assertThatThrownBy(() -> event.reserve(null))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessageContaining("seat is required");
 
