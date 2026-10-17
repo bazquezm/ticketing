@@ -7,6 +7,8 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -178,6 +180,69 @@ public class EventTest {
         assertThatThrownBy(() -> Event.restore(EventId.newId(),"Rock night" , null , PAST_START, 500))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessageContaining("status is required");
+    }
+
+    @Test
+    void reservesAFreeSeat(){
+
+        Event event = Event.create("Rock Night", FUTURE_START, 500, FIXED_CLOCK);
+        Seat seat = new Seat("A", 1 );
+
+        boolean reservedSeat = event.reserveFreeSeat(seat);
+
+        assertThat(reservedSeat).isEqualTo(true);
+    }
+
+    @Test
+    void rejectsReservingASeatThatIsAlreadyReserved(){
+
+        Event event = Event.create("Rock Night", FUTURE_START, 500, FIXED_CLOCK);
+        Seat seat1 = new Seat("A", 1 );
+        event.reserveFreeSeat(seat1);
+
+        assertThatThrownBy(() -> event.reserveFreeSeat(seat1))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Seat is already reserved");
+
+    }
+
+    @Test
+    void rejectsAReservationWhenTheEventIsFull(){
+
+        Event event = Event.create("Rock Night", FUTURE_START, 1, FIXED_CLOCK);
+        Seat seat1 = new Seat("A", 1 );
+        Seat seat2 = new Seat("A", 2 );
+
+        event.reserveFreeSeat(seat1);
+
+        assertThatThrownBy(() -> event.reserveFreeSeat(seat2))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("event is full");
+    }
+
+    @Test
+    void rejectsANullSeat(){
+
+        Event event = Event.create("Rock Night", FUTURE_START, 1, FIXED_CLOCK);
+
+        assertThatThrownBy(() -> event.reserveFreeSeat(null))
+                .isInstanceOf(NullPointerException.class)
+                .hasMessageContaining("seat is required");
+
+    }
+
+    @Test
+    void reservedSeatsCannotBeChangedFromOutside(){
+
+        Event event = Event.create("Rock Night", FUTURE_START, 1, FIXED_CLOCK);
+        Seat seat = new Seat("A", 1 );
+
+        Set<Seat> reservedSeats = event.reservedSeats();
+
+
+        assertThatThrownBy(() -> reservedSeats.add(seat))
+                .isInstanceOf(UnsupportedOperationException.class);
+
     }
 
 }

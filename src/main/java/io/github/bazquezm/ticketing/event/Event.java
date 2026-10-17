@@ -2,7 +2,10 @@ package io.github.bazquezm.ticketing.event;
 
 import java.time.Clock;
 import java.time.ZonedDateTime;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 public final class Event {
 
@@ -13,6 +16,7 @@ public final class Event {
     private final ZonedDateTime start;
     private final int capacity;
     private EventStatus status;
+    private Set<Seat> reservedSeats;
 
     public static Event create(String name, ZonedDateTime start, int capacity, Clock clock) {
 
@@ -54,6 +58,7 @@ public final class Event {
         this.capacity = capacity;
         this.status = status;
         this.id = id;
+        this.reservedSeats=new HashSet<>();
     }
 
     public String name() {
@@ -76,6 +81,10 @@ public final class Event {
         return id;
     }
 
+    public Set<Seat> reservedSeats() {
+        return Collections.unmodifiableSet(reservedSeats);
+    }
+
     @Override
     public boolean equals(Object obj) {
         return obj instanceof Event other && id.equals(other.id);
@@ -84,5 +93,22 @@ public final class Event {
     @Override
     public int hashCode() {
         return id.hashCode();
+    }
+
+    public boolean reserveFreeSeat(Seat seat) {
+
+        Objects.requireNonNull(seat , "seat is required");
+
+        if ( reservedSeats.contains(seat) ){
+            throw new IllegalStateException("Seat is already reserved " + seat.row() + seat.number());
+        }
+
+        if ( reservedSeats.size() >= capacity ){
+            throw new IllegalStateException("event is full " );
+        }
+
+        reservedSeats.add(seat);
+
+        return true;
     }
 }
