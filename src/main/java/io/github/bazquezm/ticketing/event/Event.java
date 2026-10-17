@@ -16,7 +16,7 @@ public final class Event {
     private final ZonedDateTime start;
     private final int capacity;
     private EventStatus status;
-    private Set<Seat> reservedSeats;
+    private final Set<Seat> reservedSeats;
 
     public static Event create(String name, ZonedDateTime start, int capacity, Clock clock) {
 
@@ -95,7 +95,7 @@ public final class Event {
         return id.hashCode();
     }
 
-    public boolean reserveFreeSeat(Seat seat) {
+    public void reserve(Seat seat) {
 
         Objects.requireNonNull(seat , "seat is required");
 
@@ -108,7 +108,5 @@ public final class Event {
         }
 
         reservedSeats.add(seat);
-
-        return true;
     }
 }
