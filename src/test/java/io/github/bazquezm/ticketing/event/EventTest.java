@@ -9,7 +9,6 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Set;
 
-import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -270,10 +269,11 @@ public class EventTest {
         Event event = Event.create("Rock Night", FUTURE_START, 500, FIXED_CLOCK);
         Seat seat = new Seat("A", 1);
 
-        assertThat(event.reservedSeats()).isEmpty();
+
         assertThatThrownBy(() -> event.reserve(seat))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("not published");
+        assertThat(event.reservedSeats()).isEmpty();
 
     }
 
