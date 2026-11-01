@@ -107,6 +107,15 @@ public final class Event {
             throw new IllegalStateException("event is full " );
         }
 
+        boolean takesReservations = switch (this.status){
+            case DRAFT -> false;
+            case PUBLISHED -> true;
+        };
+
+        if (!takesReservations){
+            throw new IllegalStateException("event is not published");
+        }
+
         reservedSeats.add(seat);
     }
 
