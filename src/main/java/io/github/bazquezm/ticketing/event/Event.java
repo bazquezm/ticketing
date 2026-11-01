@@ -99,14 +99,6 @@ public final class Event {
 
         Objects.requireNonNull(seat , "seat is required");
 
-        if ( reservedSeats.contains(seat) ){
-            throw new IllegalStateException("Seat is already reserved " + seat.row() + seat.number());
-        }
-
-        if ( reservedSeats.size() >= capacity ){
-            throw new IllegalStateException("event is full " );
-        }
-
         boolean takesReservations = switch (this.status){
             case DRAFT -> false;
             case PUBLISHED -> true;
@@ -114,6 +106,14 @@ public final class Event {
 
         if (!takesReservations){
             throw new IllegalStateException("event is not published");
+        }
+
+        if ( reservedSeats.contains(seat) ){
+            throw new IllegalStateException("Seat is already reserved " + seat.row() + seat.number());
+        }
+
+        if ( reservedSeats.size() >= capacity ){
+            throw new IllegalStateException("event is full " );
         }
 
         reservedSeats.add(seat);
