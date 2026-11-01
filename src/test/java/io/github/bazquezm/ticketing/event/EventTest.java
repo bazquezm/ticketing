@@ -9,6 +9,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Set;
 
+import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -291,6 +292,17 @@ public class EventTest {
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("must be in the future");
         assertThat(event.status()).isEqualTo(EventStatus.DRAFT);
+    }
+
+    @Test
+    void publishesAnEventThatStartsInOneSecond(){
+        Clock atStart = Clock.fixed(FUTURE_START.toInstant(), MEXICO_CITY);
+        Event event = Event.create("Rock Night", FUTURE_START.plusSeconds(1), 100, FIXED_CLOCK);
+
+        event.publish(atStart);
+
+        assertThat(event.status()).isEqualTo(EventStatus.PUBLISHED);
+
     }
 
 }
