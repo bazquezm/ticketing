@@ -282,4 +282,15 @@ public class EventTest {
         return event;
     }
 
+    @Test
+    void rejectsPublishingAnEventThatStartsNow (){
+        Clock atStart = Clock.fixed(FUTURE_START.toInstant(), MEXICO_CITY);
+        Event event = Event.create("Rock Night", FUTURE_START, 100, FIXED_CLOCK);
+
+        assertThatThrownBy(() -> event.publish(atStart))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("must be in the future");
+        assertThat(event.status()).isEqualTo(EventStatus.DRAFT);
+    }
+
 }

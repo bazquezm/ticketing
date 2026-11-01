@@ -125,6 +125,11 @@ public final class Event {
             throw new IllegalStateException("event already published");
         }
 
+        if (!this.start().isAfter(ZonedDateTime.now(clock))) {
+            throw new IllegalStateException("The start date must be in the future");
+        }
+
+
         this.status= EventStatus.PUBLISHED;
     }
 }
