@@ -253,4 +253,15 @@ public class EventTest {
         assertThat(event.status()).isEqualTo(EventStatus.PUBLISHED);
     }
 
+    @Test
+    void rejectsPublishingAnAlreadyPublishedEvent (){
+
+        Event event = Event.create("Rock Night", FUTURE_START, 500, FIXED_CLOCK);
+        event.publish(FIXED_CLOCK);
+
+        assertThatThrownBy(() -> event.publish(FIXED_CLOCK))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("event already published");
+    }
+
 }

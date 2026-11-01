@@ -110,7 +110,12 @@ public final class Event {
         reservedSeats.add(seat);
     }
 
-    public void publish(Clock fixedClock) {
+    public void publish(Clock clock) {
+
+        if ( EventStatus.PUBLISHED.equals(this.status) ){
+            throw new IllegalStateException("event already published");
+        }
+
         this.status= EventStatus.PUBLISHED;
     }
 }
