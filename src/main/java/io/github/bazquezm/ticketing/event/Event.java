@@ -99,6 +99,15 @@ public final class Event {
 
         Objects.requireNonNull(seat , "seat is required");
 
+        boolean takesReservations = switch (this.status){
+            case DRAFT -> false;
+            case PUBLISHED -> true;
+        };
+
+        if (!takesReservations){
+            throw new IllegalStateException("event is not published");
+        }
+
         if ( reservedSeats.contains(seat) ){
             throw new IllegalStateException("Seat is already reserved " + seat.row() + seat.number());
         }
@@ -108,5 +117,19 @@ public final class Event {
         }
 
         reservedSeats.add(seat);
+    }
+
+    public void publish(Clock clock) {
+
+        if ( EventStatus.PUBLISHED.equals(this.status) ){
+            throw new IllegalStateException("event already published");
+        }
+
+        if (!this.start().isAfter(ZonedDateTime.now(clock))) {
+            throw new IllegalStateException("The start date must be in the future");
+        }
+
+
+        this.status= EventStatus.PUBLISHED;
     }
 }

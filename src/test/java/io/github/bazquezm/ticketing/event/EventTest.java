@@ -184,7 +184,7 @@ public class EventTest {
     @Test
     void reservesAFreeSeat(){
 
-        Event event = Event.create("Rock Night", FUTURE_START, 500, FIXED_CLOCK);
+        Event event = publishedEvent(500);
         Seat seat = new Seat("A", 1 );
 
         event.reserve(seat);
@@ -196,7 +196,7 @@ public class EventTest {
     @Test
     void rejectsReservingASeatThatIsAlreadyReserved(){
 
-        Event event = Event.create("Rock Night", FUTURE_START, 500, FIXED_CLOCK);
+        Event event = publishedEvent(500);
         Seat seat1 = new Seat("A", 1 );
         event.reserve(seat1);
 
@@ -210,7 +210,7 @@ public class EventTest {
     @Test
     void rejectsAReservationWhenTheEventIsFull(){
 
-        Event event = Event.create("Rock Night", FUTURE_START, 1, FIXED_CLOCK);
+        Event event = publishedEvent(1);
         Seat seat1 = new Seat("A", 1 );
         Seat seat2 = new Seat("A", 2 );
 
@@ -243,6 +243,65 @@ public class EventTest {
 
         assertThatThrownBy(() -> reservedSeats.add(seat))
                 .isInstanceOf(UnsupportedOperationException.class);
+
+    }
+
+    @Test
+    void publishesADraftEvent(){
+        Event event = Event.create("Rock Night", FUTURE_START, 500, FIXED_CLOCK);
+        event.publish(FIXED_CLOCK);
+        assertThat(event.status()).isEqualTo(EventStatus.PUBLISHED);
+    }
+
+    @Test
+    void rejectsPublishingAnAlreadyPublishedEvent (){
+
+        Event event = Event.create("Rock Night", FUTURE_START, 500, FIXED_CLOCK);
+        event.publish(FIXED_CLOCK);
+
+        assertThatThrownBy(() -> event.publish(FIXED_CLOCK))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("event already published");
+    }
+
+    @Test
+    void rejectsReservingASeatOnADraftEvent(){
+        Event event = Event.create("Rock Night", FUTURE_START, 500, FIXED_CLOCK);
+        Seat seat = new Seat("A", 1);
+
+
+        assertThatThrownBy(() -> event.reserve(seat))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("not published");
+        assertThat(event.reservedSeats()).isEmpty();
+
+    }
+
+    private static Event publishedEvent(int capacity) {
+        Event event = Event.create("Rock Night", FUTURE_START, capacity, FIXED_CLOCK);
+        event.publish(FIXED_CLOCK);
+        return event;
+    }
+
+    @Test
+    void rejectsPublishingAnEventThatStartsNow (){
+        Clock atStart = Clock.fixed(FUTURE_START.toInstant(), MEXICO_CITY);
+        Event event = Event.create("Rock Night", FUTURE_START, 100, FIXED_CLOCK);
+
+        assertThatThrownBy(() -> event.publish(atStart))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("must be in the future");
+        assertThat(event.status()).isEqualTo(EventStatus.DRAFT);
+    }
+
+    @Test
+    void publishesAnEventThatStartsInOneSecond(){
+        Clock atStart = Clock.fixed(FUTURE_START.toInstant(), MEXICO_CITY);
+        Event event = Event.create("Rock Night", FUTURE_START.plusSeconds(1), 100, FIXED_CLOCK);
+
+        event.publish(atStart);
+
+        assertThat(event.status()).isEqualTo(EventStatus.PUBLISHED);
 
     }
 
