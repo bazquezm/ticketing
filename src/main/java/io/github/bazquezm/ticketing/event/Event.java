@@ -109,4 +109,8 @@ public final class Event {
 
         reservedSeats.add(seat);
     }
+
+    public void publish(Clock fixedClock) {
+        this.status= EventStatus.PUBLISHED;
+    }
 }

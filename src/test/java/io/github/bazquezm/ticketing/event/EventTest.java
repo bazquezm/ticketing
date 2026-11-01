@@ -246,4 +246,11 @@ public class EventTest {
 
     }
 
+    @Test
+    void publishesADraftEvent(){
+        Event event = Event.create("Rock Night", FUTURE_START, 500, FIXED_CLOCK);
+        event.publish(FIXED_CLOCK);
+        assertThat(event.status()).isEqualTo(EventStatus.PUBLISHED);
+    }
+
 }
