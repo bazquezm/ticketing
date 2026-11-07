@@ -305,4 +305,14 @@ public class EventTest {
 
     }
 
+    @Test
+    void cancelsDraftEvent(){
+
+        Event event = Event.create("Rock Night", FUTURE_START.plusSeconds(1), 100, FIXED_CLOCK);
+
+        event.cancel();
+        assertThat(event.status()).isEqualTo(EventStatus.CANCELLED);
+
+    }
+
 }

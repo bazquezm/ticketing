@@ -100,7 +100,7 @@ public final class Event {
         Objects.requireNonNull(seat , "seat is required");
 
         boolean takesReservations = switch (this.status){
-            case DRAFT -> false;
+            case DRAFT, CANCELLED -> false;
             case PUBLISHED -> true;
         };
 
@@ -131,5 +131,10 @@ public final class Event {
 
 
         this.status= EventStatus.PUBLISHED;
+    }
+
+    public void cancel() {
+
+        this.status= EventStatus.CANCELLED;
     }
 }
