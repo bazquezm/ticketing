@@ -309,9 +309,22 @@ public class EventTest {
     void cancelsDraftEvent(){
 
         Event event = Event.create("Rock Night", FUTURE_START.plusSeconds(1), 100, FIXED_CLOCK);
-
         event.cancel();
+
         assertThat(event.status()).isEqualTo(EventStatus.CANCELLED);
+
+    }
+
+    @Test
+    void rejectsReservingOnCancelledEvent (){
+
+        Event event = publishedEvent(500);
+        event.cancel();
+        Seat seat= new Seat("A", 1);
+
+        assertThatThrownBy(() -> event.reserve(seat))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("is not published");
 
     }
 
