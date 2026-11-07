@@ -135,6 +135,16 @@ public final class Event {
 
     public void cancel() {
 
-        this.status= EventStatus.CANCELLED;
+        boolean canBeCancelled = switch (this.status){
+            case DRAFT,PUBLISHED -> true;
+            case CANCELLED -> false;
+        };
+
+        if (!canBeCancelled){
+            throw new IllegalStateException("is already cancelled");
+        }
+
+        this.status = EventStatus.CANCELLED;
+
     }
 }

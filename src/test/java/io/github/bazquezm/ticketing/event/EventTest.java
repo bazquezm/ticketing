@@ -328,4 +328,16 @@ public class EventTest {
 
     }
 
+
+    @Test
+    void rejectsCancellingCancelledEvent(){
+        Event event = publishedEvent(500);
+        event.cancel();
+
+        assertThatThrownBy(() -> event.cancel())
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("is already cancelled");
+        assertThat(event.status()).isEqualTo(EventStatus.CANCELLED);
+    }
+
 }
