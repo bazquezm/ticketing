@@ -100,7 +100,7 @@ public final class Event {
         Objects.requireNonNull(seat , "seat is required");
 
         boolean takesReservations = switch (this.status){
-            case DRAFT -> false;
+            case DRAFT, CANCELLED -> false;
             case PUBLISHED -> true;
         };
 
@@ -121,15 +121,33 @@ public final class Event {
 
     public void publish(Clock clock) {
 
-        if ( EventStatus.PUBLISHED.equals(this.status) ){
-            throw new IllegalStateException("event already published");
-        }
+        EventStatus nextStatus = switch (this.status){
+            case PUBLISHED -> throw new IllegalStateException("event already published");
+            case CANCELLED -> throw new IllegalStateException("event is already cancelled");
+            case DRAFT -> EventStatus.PUBLISHED;
+
+        };
 
         if (!this.start().isAfter(ZonedDateTime.now(clock))) {
             throw new IllegalStateException("The start date must be in the future");
         }
 
+        this.status = nextStatus;
 
-        this.status= EventStatus.PUBLISHED;
+    }
+
+    public void cancel(Clock clock) {
+
+        EventStatus nextStatus = switch (this.status){
+            case DRAFT,PUBLISHED -> EventStatus.CANCELLED;
+            case CANCELLED -> throw new IllegalStateException("event is already cancelled");
+        };
+
+        if (!this.start().isAfter(ZonedDateTime.now(clock))) {
+            throw new IllegalStateException("event already started");
+        }
+
+        this.status = nextStatus;
+
     }
 }
