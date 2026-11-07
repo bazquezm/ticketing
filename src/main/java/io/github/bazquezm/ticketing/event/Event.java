@@ -121,17 +121,18 @@ public final class Event {
 
     public void publish(Clock clock) {
 
+        EventStatus nextStatus = switch (this.status){
+            case PUBLISHED -> throw new IllegalStateException("event already published");
+            case CANCELLED -> throw new IllegalStateException("event is already cancelled");
+            case DRAFT -> EventStatus.PUBLISHED;
+
+        };
+
         if (!this.start().isAfter(ZonedDateTime.now(clock))) {
             throw new IllegalStateException("The start date must be in the future");
         }
 
-        switch (this.status){
-            case PUBLISHED -> throw new IllegalStateException("event already published");
-            case CANCELLED -> throw new IllegalStateException("event is already cancelled");
-            case DRAFT -> this.status= EventStatus.PUBLISHED;
-        };
-
-
+        this.status = nextStatus;
 
     }
 
