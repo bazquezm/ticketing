@@ -138,20 +138,16 @@ public final class Event {
 
     public void cancel(Clock clock) {
 
-        boolean canBeCancelled = switch (this.status){
-            case DRAFT,PUBLISHED -> true;
-            case CANCELLED -> false;
+        EventStatus nextStatus = switch (this.status){
+            case DRAFT,PUBLISHED -> EventStatus.CANCELLED;
+            case CANCELLED -> throw new IllegalStateException("event is already cancelled");
         };
 
         if (!this.start().isAfter(ZonedDateTime.now(clock))) {
             throw new IllegalStateException("event already started");
         }
 
-        if (!canBeCancelled){
-            throw new IllegalStateException("event is already cancelled");
-        }
-
-        this.status = EventStatus.CANCELLED;
+        this.status = nextStatus;
 
     }
 }

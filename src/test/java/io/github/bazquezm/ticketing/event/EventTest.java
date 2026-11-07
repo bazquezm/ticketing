@@ -353,7 +353,7 @@ public class EventTest {
     }
 
     @Test
-    void rejectsCancelingAnEventThatStartsNow (){
+    void rejectsCancellingAnEventThatStartsNow (){
         Clock atStart = Clock.fixed(FUTURE_START.toInstant(), MEXICO_CITY);
         Event event=publishedEvent(500);
 
