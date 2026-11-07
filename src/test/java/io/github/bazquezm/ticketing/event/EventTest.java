@@ -336,8 +336,21 @@ public class EventTest {
 
         assertThatThrownBy(() -> event.cancel())
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("is already cancelled");
+                .hasMessageContaining("event is already cancelled");
         assertThat(event.status()).isEqualTo(EventStatus.CANCELLED);
+    }
+
+    @Test
+    void rejectsPublishingCancelledEvent(){
+
+        Event event = publishedEvent(500);
+        event.cancel();
+
+        assertThatThrownBy(() -> event.publish(FIXED_CLOCK))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("event is already cancelled");
+        assertThat(event.status()).isEqualTo(EventStatus.CANCELLED);
+
     }
 
 }
