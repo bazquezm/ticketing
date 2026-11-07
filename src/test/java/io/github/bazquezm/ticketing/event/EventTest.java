@@ -307,9 +307,8 @@ public class EventTest {
 
     @Test
     void cancelsDraftEvent(){
-
         Event event = Event.create("Rock Night", FUTURE_START.plusSeconds(1), 100, FIXED_CLOCK);
-        event.cancel();
+        event.cancel(FIXED_CLOCK);
 
         assertThat(event.status()).isEqualTo(EventStatus.CANCELLED);
 
@@ -319,7 +318,7 @@ public class EventTest {
     void rejectsReservingOnCancelledEvent (){
 
         Event event = publishedEvent(500);
-        event.cancel();
+        event.cancel(FIXED_CLOCK);
         Seat seat= new Seat("A", 1);
 
         assertThatThrownBy(() -> event.reserve(seat))
@@ -332,9 +331,9 @@ public class EventTest {
     @Test
     void rejectsCancellingCancelledEvent(){
         Event event = publishedEvent(500);
-        event.cancel();
+        event.cancel(FIXED_CLOCK);
 
-        assertThatThrownBy(() -> event.cancel())
+        assertThatThrownBy(() -> event.cancel(FIXED_CLOCK))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("event is already cancelled");
         assertThat(event.status()).isEqualTo(EventStatus.CANCELLED);
@@ -344,11 +343,33 @@ public class EventTest {
     void rejectsPublishingCancelledEvent(){
 
         Event event = publishedEvent(500);
-        event.cancel();
+        event.cancel(FIXED_CLOCK);
 
         assertThatThrownBy(() -> event.publish(FIXED_CLOCK))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("event is already cancelled");
+        assertThat(event.status()).isEqualTo(EventStatus.CANCELLED);
+
+    }
+
+    @Test
+    void rejectsCancelingAnEventThatStartsNow (){
+        Clock atStart = Clock.fixed(FUTURE_START.toInstant(), MEXICO_CITY);
+        Event event=publishedEvent(500);
+
+        assertThatThrownBy(() -> event.cancel(atStart))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("event already started");
+        assertThat(event.status()).isEqualTo(EventStatus.PUBLISHED);
+    }
+
+    @Test
+    void cancelsAnEventThatStartsInOneSecond(){
+        Clock atStart = Clock.fixed(FUTURE_START.minusSeconds(1).toInstant(), MEXICO_CITY);
+        Event event=publishedEvent(500);
+
+        event.cancel(atStart);
+
         assertThat(event.status()).isEqualTo(EventStatus.CANCELLED);
 
     }
